@@ -13,12 +13,12 @@ import { InputField } from '../components/InputField';
 import { useMutation } from 'urql';
 import { useRouter } from 'next/router';
 
-interface registerProps {}
+interface loginProps {}
 
-const REGISTER_MUTATION = 
+const LOGIN_MUTATION = 
 `
-mutation Register($username:String!,$email:String!,$password:String!){
-  register(options:{username:$username,email:$email,password:$password}){
+mutation login($username:String!,$password:String!){
+  login(options:{username:$username,password:$password}){
     errors{
       field,
       message
@@ -27,7 +27,6 @@ mutation Register($username:String!,$email:String!,$password:String!){
       user{
         id,
         username,
-        email
       }
       token
     }
@@ -35,8 +34,9 @@ mutation Register($username:String!,$email:String!,$password:String!){
 }
 `
 
-const Register: React.FC<registerProps> = ({}) => {
+const Login: React.FC<loginProps> = ({}) => {
   const router = useRouter();
+  const [,login] = useMutation(LOGIN_MUTATION)
 
   useEffect(() => {
     // redirect to home if already logged in
@@ -47,25 +47,23 @@ const Register: React.FC<registerProps> = ({}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
-  const [,register] = useMutation(REGISTER_MUTATION)
     return (
         <Wrapper variant="small">
-          <Formik initialValues={{ username: '',email:'',password:'' }}
+          <Formik initialValues={{ username: '',password:'' }}
         onSubmit={async (values) => {
           console.log(values)
-            const a = await register(values);
-            console.log(a.data.register.userData[0].user)
-            console.log(a.data.register.userData[0].token)
-            localStorage.setItem('token',a.data.register.userData[0].token)
+            const a = await login(values);
+            console.log(a.data.login.userData[0].user)
+            console.log(a.data.login.userData[0].token)
+            localStorage.setItem('token',a.data.login.userData[0].token)
       
         }}
       >
         {({isSubmitting})=>(
           <Form>
           <InputField name="username" label="User Name" placeholder="John Doe"></InputField>
-          <InputField name="email" label="Email" placeholder="joh@email.com" type="email"></InputField>
           <InputField name="password" label="Password" type="password" ></InputField>
-          <Button mt={4} type="submit" isLoading={isSubmitting} colorScheme="teal" variant="solid">Register</Button>
+          <Button mt={4} type="submit" isLoading={isSubmitting} colorScheme="teal" variant="solid">Login</Button>
           </Form>
         )}
       </Formik>
@@ -73,4 +71,4 @@ const Register: React.FC<registerProps> = ({}) => {
     )
 }
 
-export default Register
+export default Login
