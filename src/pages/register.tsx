@@ -57,7 +57,7 @@ const Register: React.FC<registerProps> = ({}) => {
             const response = await register(values);
             if(response.data?.register.errors){
               setErrors(toErrorMap(response.data.register.errors))
-            }else{
+            }else if(response.data?.register.userData[0].token){
               router.push('/')
             }
             console.log(response.data.register.userData[0].user)
