@@ -12,6 +12,7 @@ import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
 import { useMutation } from 'urql';
 import { useRouter } from 'next/router';
+import { toErrorMap } from '../Utils/toErrorMap';
 
 interface loginProps {}
 
@@ -50,12 +51,17 @@ const Login: React.FC<loginProps> = ({}) => {
     return (
         <Wrapper variant="small">
           <Formik initialValues={{ username: '',password:'' }}
-        onSubmit={async (values) => {
+        onSubmit={async (values,{setErrors}) => {
           console.log(values)
-            const a = await login(values);
-            console.log(a.data.login.userData[0].user)
-            console.log(a.data.login.userData[0].token)
-            localStorage.setItem('token',a.data.login.userData[0].token)
+            const response = await login(values);
+            if(response.data?.login.errors){
+              setErrors(toErrorMap(response.data.login.errors))
+            }else{
+              router.push('/')
+            }
+            console.log(response.data.login.userData[0].user)
+            console.log(response.data.login.userData[0].token)
+            localStorage.setItem('token',response.data.login.userData[0].token)
       
         }}
       >

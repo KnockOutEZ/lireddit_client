@@ -12,6 +12,7 @@ import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
 import { useMutation } from 'urql';
 import { useRouter } from 'next/router';
+import { toErrorMap } from '../Utils/toErrorMap';
 
 interface registerProps {}
 
@@ -51,12 +52,17 @@ const Register: React.FC<registerProps> = ({}) => {
     return (
         <Wrapper variant="small">
           <Formik initialValues={{ username: '',email:'',password:'' }}
-        onSubmit={async (values) => {
+        onSubmit={async (values,{setErrors}) => {
           console.log(values)
-            const a = await register(values);
-            console.log(a.data.register.userData[0].user)
-            console.log(a.data.register.userData[0].token)
-            localStorage.setItem('token',a.data.register.userData[0].token)
+            const response = await register(values);
+            if(response.data?.register.errors){
+              setErrors(toErrorMap(response.data.register.errors))
+            }else{
+              router.push('/')
+            }
+            console.log(response.data.register.userData[0].user)
+            console.log(response.data.register.userData[0].token)
+            localStorage.setItem('token',response.data.register.userData[0].token)
       
         }}
       >
